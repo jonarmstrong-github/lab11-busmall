@@ -159,7 +159,7 @@ function chartNames() {
   let tempArray = [];
   for (let i = 0; i < prodArray.length; i++) {
   tempArray.push(prodArray[i].prodName);
-    // myChartObj.data.labels[i] = prodArray[i].prodName;
+  //myChartObj.data.labels[i] = prodArray[i].prodName;
   }
   console.log('Product labels were successfully added to chart.');
   console.log(tempArray);
