@@ -20,6 +20,16 @@ let prodPlaceThree = document.getElementById('prodPlaceThree'); //Image three bo
 
 let results = document.getElementById('results');               //Where text results populate in HTML
 
+//LOCAL STORAGE PART TWO
+
+let retrievedProd = localStorage.getItem('Products');
+console.log('Stringified prodArray was retrieved from local storage.');
+console.log(retrievedProd);                       //LOG FOR DEBUG
+
+let parsedProd = JSON.parse(retrievedProd);       //Creates Object literal
+console.log(`Stringified prodArray was parsed.`);
+console.log(parsedProd);                          //LOG FOR DEBUG
+
 // CONSTRUCTORS
 
 function ProdLoc(name) {  //CATCHES SPAM
@@ -36,37 +46,54 @@ function Product(name, suffix = 'jpg') {  //put parameters with defaults last
   prodArray.push(this); //sends each object into an array
 }
 
-    //PRODUCTS
+//PRODUCTS
 
-    new Product('bag');
-    new Product('banana');
-    new Product('bathroom');
-    new Product('boots');
-    new Product('breakfast');
-    new Product('bubblegum');
-    new Product('chair');
-    new Product('cthulhu');
-    new Product('dog-duck');
-    new Product('dragon');
-    new Product('pen');
-    new Product('pet-sweep');
-    new Product('scissors');
-    new Product('shark');
-    new Product('sweep', 'png');
-    new Product('tauntaun');
-    new Product('unicorn');
-    new Product('water-can');
-    new Product('wine-glass');
+if (retrievedProd) {                //I DO NOT UNDERSTAND WHAT RETRIEVEDPROD IS DOING IN THAT IF STATEMENT.
+  // prodArray = parsedProd;       //PARSED DATA USED WITHOUT PROTOTYPES.  //INSPIRED BY AUDREY
+  console.log(`Parsed Products from last voting session was passed into this voting session.`);
 
-    console.log(prodArray);  //debug
+  for (let i = 0; i < parsedProd.length; i++) {
+    if (parsedProd[i].prodName === 'sweep') {
+      let reconstructedSweep = new Product(parsedProd[i].prodName, 'png');
+      reconstructedSweep.views = parsedProd[i].views;
+      reconstructedSweep.clicks = parsedProd[i].views;
+    } else {
+      let reconstructedProduct = new Product(parsedProd[i].prodName);
+      reconstructedProduct.views = parsedProd[i].views;
+      reconstructedProduct.clicks = parsedProd[i].views;
+    };
+  }
+} else {
+  new Product('bag');
+  new Product('banana');
+  new Product('bathroom');
+  new Product('boots');
+  new Product('breakfast');
+  new Product('bubblegum');
+  new Product('chair');
+  new Product('cthulhu');
+  new Product('dog-duck');
+  new Product('dragon');
+  new Product('pen');
+  new Product('pet-sweep');
+  new Product('scissors');
+  new Product('shark');
+  new Product('sweep', 'png');
+  new Product('tauntaun');
+  new Product('unicorn');
+  new Product('water-can');
+  new Product('wine-glass');
 
-    //LOCATIONS
+  console.log(prodArray);  //debug
 
-    new ProdLoc(`prodPlaceOne`);
-    new ProdLoc(`prodPlaceTwo`);
-    new ProdLoc(`prodPlaceThree`);
+};
+//LOCATIONS
 
-    console.log(locArray);  //debug
+new ProdLoc(`prodPlaceOne`);
+new ProdLoc(`prodPlaceTwo`);
+new ProdLoc(`prodPlaceThree`);
+
+console.log(locArray);  //debug
 
 // FUNCTIONS
 
@@ -111,7 +138,7 @@ function renderImg() {
 //Render chart
 function renderChart() {
   //FROM CHARTJS
-  let prodNames = chartNames();
+  let prodNames = chartNames();   //DIFFERENT THAN PRODNAME IN OBJECT
   let prodViews = chartViews();
   let prodVotes = chartVotes();
 
@@ -147,19 +174,15 @@ function renderChart() {
 }
 
 // RANDOM PRODUCT PICKER
-function getRandProd() {                                  //borrowed from Audrey and W3 Schools
-  return Math.floor(Math.random() * prodArray.length);    //Math.random pulls a 16 digit decimal 0.xxxxxxxxxxxxxxxx.
-  //Math.floor always rounds down to an integer.
-  //prodArray has 19 spaces  0 - 18.
-  //19 * 0.anything will always provide a number that can be rounded down to an space in the array.
+function getRandProd() {
+  return Math.floor(Math.random() * prodArray.length);
 }
 
 //PRODUCT NAMES TO CHART
 function chartNames() {
   let tempArray = [];
   for (let i = 0; i < prodArray.length; i++) {
-  tempArray.push(prodArray[i].prodName);
-  //myChartObj.data.labels[i] = prodArray[i].prodName;
+    tempArray.push(prodArray[i].prodName);
   }
   console.log('Product labels were successfully added to chart.');
   console.log(tempArray);
@@ -195,7 +218,6 @@ function chartVotes() {
 //EVENTS  //SAMPLED FROM AUDREY
 
 function clickSniffer(event) {                          //ON CLICK EVENT THIS ALL HAPPENS
-  console.log(`There has been an event!!!  @`, event.path[0]);
   console.log(`Click sniffer is sniffing.`);
 
   //SPAM COUNT
@@ -203,6 +225,7 @@ function clickSniffer(event) {                          //ON CLICK EVENT THIS AL
   for (let i = 0; i < locArray.length; i++) {
     if (prodLoc === locArray[i].id) {
       locArray[i].clicks++;
+      console.log(`There has been an event!!!  @`, event.path[i]);
     }
   }
 
@@ -216,7 +239,7 @@ function clickSniffer(event) {                          //ON CLICK EVENT THIS AL
   console.log(`${prodClicked} was clicked.`);
 
   //REDUCES REMAINING VOTE COUNT
-  voteCount--;                                        
+  voteCount--;
   renderImg();
 
   //VOTING COMPLETE
@@ -237,15 +260,16 @@ function clickSniffer(event) {                          //ON CLICK EVENT THIS AL
       spamChecker.appendChild(li);
     }
 
-    //RESULTS TO MYCHART  //FAILED ATTEMPT BECAUSE CHART WOULD LOAD BEFORE VALUES WERE ADDED TO ARRAY
-    // for (let i = 0; i < prodArray.length; i++) {
-      //myChartObj.data.datasets[0].data[i] = prodArray[i].views;
-      //myChartObj.data.datasets[1].data[i] = prodArray[i].clicks;
-    //}
-    //console.log(myChartObj.data.datasets[0].data);
-    //console.log(myChartObj.data.datasets[1].data);
-
     renderChart();
+
+    //LOCAL STORAGE BEGINS HERE AFTER VOTES HAVE BEEN DEPLETED.
+    let stringifiedProd = JSON.stringify(prodArray);  //STRINGIFIED VERSION OF PRODARRAY STORED.
+    console.log('prodArray was stringified.');
+    console.log(stringifiedProd);                     //LOG FOR DEBUG
+
+    localStorage.setItem('Products', stringifiedProd);//STRINGIFIED VERSION SET IN STORAGE
+    console.log(`Stringified prodArray was stored locally in "Products".`);
+
   }
 }
 
